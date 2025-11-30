@@ -14,10 +14,10 @@ class csv_data:
                 rows.append(line[:-1].split(delimiter))
         return (headers, rows)
 
-    def get_headers(self):
+    def get_headers(self) -> list[str]:
         return self.__headers
 
-    def get_rows(self):
+    def get_rows(self) -> list[list[str]]:
         return self.__rows
 
     def __repr__(self) -> str:
