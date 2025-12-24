@@ -1,4 +1,4 @@
-class csv_data:
+class CsvData:
     def __init__(self, path: str, delimiter: str=","):
         self.path = path
         data = self.__read_file(delimiter)
