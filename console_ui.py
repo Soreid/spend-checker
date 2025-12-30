@@ -1,22 +1,26 @@
 class ConsoleUI:
-    def __print_selector(self, items: list, skip_indexes: list = None) -> None:
+    def __print_selector(self, items: list, skip_indexes: list[int] = None) -> None:
         for i in range(len(items)):
             if i not in skip_indexes:
                 print(f"{i + 1}: {items[i]}")
 
     def __get_selector(self, text: str, items: list) -> int:
         entry = -1
-        while entry <= 0 or entry > len(items):
-            try:
-                entry = int(input(text))
-            except:
-                print("Please enter a number to select the associated entry.")
-                entry = -1
-            if entry <= 0 or entry > len(items):
-                print("Selection invalid. Please select a different entry.")
-        return entry
+        try:
+            entry = int(input(text))
+        except:
+            print("Invalid selection. Please enter a number.")
+            return self.__get_selector(text, items)
+        if entry < 0 or entry > len(items):
+            print("Selection invalid. Please select a different entry.")
+            return self.__get_selector(text, items)
+        return entry - 1
 
-    def selection_menu(self, text: str, items: list, ignore: list = None) -> int:
+    def selection_menu(self, text: str, items: list, ignore: list[int] | None = None) -> int:
+        """Displays a numbered list of options to the user and returns the index of the selected item.
+        
+        Return values are -1 through the maximum index of items.
+        """
         self.__print_selector(items, ignore)
         return self.__get_selector(text, items)
 
@@ -38,6 +42,7 @@ class ConsoleUI:
         return max_chars
             
     def display_table(self, header: list[str], data: list[list]) -> None:
+        """Prints data to the console adjusted for column widths."""
         padding_set = self.__get_col_lengths(header, data)
         data.insert(0, header)
         for i in range(len(data)):
@@ -48,3 +53,15 @@ class ConsoleUI:
                     break
                 line += ' | '
             print(line)
+
+    def __match_search_term(self, values: list[str], term: str) -> list[str]:
+        matches: list[str] = []
+        for value in values:
+            if term.lower() in value.lower():
+                matches.append(value)
+        return matches
+            
+    def search(self, values: list[str]) -> list[str]:
+        """Requests an input value and returns the list items containing that value."""
+        search_term = input("Enter the search term: ")
+        return self.__match_search_term(values, search_term)

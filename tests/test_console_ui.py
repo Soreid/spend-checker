@@ -51,5 +51,33 @@ class Test_ConsoleUI(unittest.TestCase):
             with self.subTest(test = test):
                 self.assertEqual(self.ui._ConsoleUI__get_col_lengths(test["header"], test["data"]), test["expected"])
 
+    def test_match_search_term(self):
+        tests = [
+            {
+                "values": ["Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen"],
+                "term": "teen",
+                "expected": ["Thirteen", "Fourteen", "Fifteen"]
+            },
+            {
+                "values": ["Red", "Blue", "Green", "Purple"],
+                "term": "",
+                "expected": ["Red", "Blue", "Green", "Purple"]
+            },
+            {
+                "values": [],
+                "term": "empty",
+                "expected": []
+            },
+            {
+                "values": ["Android", "Potato", "Right-Handed", "Crane", "Jaguar", "Plastic", "Sand"],
+                "term": "and",
+                "expected": ["Android", "Right-Handed", "Sand"]
+            }
+        ]
+
+        for test in tests:
+            with self.subTest(test = test):
+                self.assertEqual(self.ui._ConsoleUI__match_search_term(test["values"], test["term"]), test["expected"])
+
 if __name__ == '__main__':
     unittest.main()
