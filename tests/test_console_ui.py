@@ -72,6 +72,11 @@ class Test_ConsoleUI(unittest.TestCase):
                 "values": ["Android", "Potato", "Right-Handed", "Crane", "Jaguar", "Plastic", "Sand"],
                 "term": "and",
                 "expected": ["Android", "Right-Handed", "Sand"]
+            },
+            {
+                "values": ["One", "Two", "Three", "Four"],
+                "term": "Five",
+                "expected": []
             }
         ]
 

@@ -63,7 +63,7 @@ class Test_Main(unittest.TestCase):
                     ["6221", "Alice", "SR639A", "Lorem ex vitae amet dolor."]
                 ]
             },
-                        {
+            {
                 "data": test_data,
                 "cols": [],
                 "expected": [
@@ -75,3 +75,21 @@ class Test_Main(unittest.TestCase):
         for test in tests:
             with self.subTest(test = test):
                 self.assertEqual(main.get_rows_by_col(test["data"], test["cols"]), test["expected"])
+
+    def test_category_init(self):
+        tests = [
+            {
+                "header": ["Amount", "Description"],
+                "data": [[23.45, "Groceries"], [81.25, "Utilities"]],
+                "expected_header": ["Amount", "Description", "Category"],
+                "expected_data": [[23.45, "Groceries", ""], [81.25, "Utilities", ""]]
+            }
+        ]
+
+        for test in tests:
+            with self.subTest(test = test):
+                header = test["header"]
+                data = test["data"]
+                main.category_init(header, data)
+                self.assertEqual(header, test["expected_header"])
+                self.assertEqual(data, test["expected_data"])

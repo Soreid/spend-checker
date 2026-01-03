@@ -36,17 +36,31 @@ def main():
             data.append(row[i])
         data_strs.append(data)
 
+    category_init(header_strs, data_strs)
+
+    category_col = header_strs.index("Category")
+
     # Table Execution
 
     while True:
-        show_menu(ui, header_strs, data_strs)
+        show_menu(ui, header_strs, data_strs, "Enter: Search Description | X: Exit Program")
         entry = input().lower()
         match entry:
             case "":
                 matches = ui.search(get_col_vals(rows, desc_col))
-                new_rows = get_rows_by_col(data_strs, matches)
-                show_menu(ui, header_strs, new_rows)
-                input("Press enter to return to the menu.")
+                new_rows = get_rows_by_col(data_strs, matches) # What if nothing matches?
+                if len(new_rows[0]) == 0:
+                    print("No results found.")
+                else:
+                    show_menu(ui, header_strs, new_rows, "C: Set Category | Enter: Clear Search")
+                    search_entry = input()
+                    if search_entry == "":
+                        pass
+                    elif search_entry == "c":
+                        category = input("Enter Category for these transactions: ")
+                        for row in new_rows:
+                            row[category_col] = category
+
             case "x":
                 print("Exiting program...")
                 break
@@ -60,9 +74,9 @@ def request_selection(ui: ConsoleUI, text: str, selections: list[str], ignore: l
         return request_selection(ui, text, selections, ignore)
     return entry
 
-def show_menu(ui: ConsoleUI, headers: list[str], data: list[list[str]]) -> None:
-    print("Enter: Search Description | X: Exit Program\n")
+def show_menu(ui: ConsoleUI, headers: list[str], data: list[list[str]], input_list: str) -> None:
     ui.display_table(headers, data)
+    print("\n" + input_list)
 
 def get_col_vals(data: list[list[str]], col: int) -> list[str]:
     values = []
@@ -84,6 +98,12 @@ def get_rows_by_col(data: list[list[str]], cols: list[str]) -> list[list[str]]:
     if len(rows) == 0:
         rows.append([])
     return rows
+
+def category_init(headers: list[str], data: list[list[str]]) -> None:
+    if "Category" not in headers:
+        headers.append("Category")
+        for row in data:
+            row.append("")
 
 if __name__ == "__main__":
     main()
