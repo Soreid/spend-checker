@@ -44,15 +44,18 @@ class ConsoleUI:
     def display_table(self, header: list[str], data: list[list]) -> None:
         """Prints data to the console adjusted for column widths."""
         padding_set = self.__get_col_lengths(header, data)
-        data.insert(0, header)
-        for i in range(len(data)):
+        data_set = data.copy()
+        data_set.insert(0, header)
+        for i in range(len(data_set)):
             line = ""
-            for j in range(len(data[i])):
-                line += self.__format_cell(data[i][j], padding_set[j])
-                if j == len(data[i]) - 1:
+            for j in range(len(data_set[i])):
+                line += self.__format_cell(data_set[i][j], padding_set[j])
+                if j == len(data_set[i]) - 1:
                     break
                 line += ' | '
             print(line)
+            if i == 0:
+                print('-'*len(line))
 
     def __match_search_term(self, values: list[str], term: str) -> list[str]:
         matches: list[str] = []
