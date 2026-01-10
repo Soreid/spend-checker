@@ -30,9 +30,11 @@ def main():
     # Table Execution
 
     while True:
-        show_menu(ui, headers, rows, display_cols, "Enter: Search Description | X: Exit Program")
+        show_menu(ui, headers, rows, display_cols, "Enter: Search Description | C: Spending Category Totals | X: Exit Program")
         entry = input().lower()
         match entry:
+
+            # Search Transaction Descriptions
             case "":
                 matches = ui.search(get_col_vals(rows, desc_col))
                 new_rows = get_rows_by_col(rows, matches)
@@ -40,15 +42,26 @@ def main():
                     print("No results found.")
                 else:
                     show_menu(ui, headers, new_rows, display_cols, "C: Set Category | Enter: Clear Search")
-                    search_entry = input()
+                    search_entry = input().lower()
                     if search_entry == "":
                         pass
+
+                    #Categorize Search Results
                     elif search_entry == "c":
                         category = input("Enter a Category for these transactions: ")
                         for row in new_rows:
-                            # parent_row = get_parent(rows, row)
                             update_category(row, category_totals, category, category_col, amount_col)
-                            print(category_totals)
+
+            # Cagetory Breakdown Table
+            case "c":
+                header = ["Category", "Total"]
+                data = []
+                for key in sorted(category_totals):
+                    data.append([key, category_totals[key]])
+                show_menu(ui, header, data, [0,1], "Enter: Return")
+                input()
+
+            # Exit Program
             case "x":
                 print("Exiting program...")
                 break
@@ -82,6 +95,7 @@ def get_display_data(data: list[list[str]], display_cols: list[int]) -> list[lis
     return display_data
 
 def get_col_vals(data: list[list[str]], col: int) -> list[str]:
+    """Returns a list of values in a single column across the data set."""
     values = []
     for i in range(len(data)):
         if col < len(data[i]):
@@ -117,15 +131,19 @@ def category_init(headers: list[str], data: list[list[str]]) -> None:
             row.append("")
 
 def update_category(row: list[str], category: dict, new_category: str, category_col: int, amount_col: int) -> None:
+    """Updates the category listing in the data row and the category dictionary to adjust for the new value...."""
     if row[category_col] != "":
         category[row[category_col]] -= float(row[amount_col])
         if category[row[category_col]] == 0:
             category.pop(row[category_col])
+        else:
+            category[row[category_col]] = round(category[row[category_col]], 2)
 
     if new_category in category.keys():
         category[new_category] += float(row[amount_col])
     else:
         category[new_category] = float(row[amount_col])
+    category[new_category] = round(category[new_category], 2)
     
     row[category_col] = new_category
 
