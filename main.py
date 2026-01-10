@@ -5,62 +5,50 @@ def main():
     data = CsvData("data/transactions.csv")
     headers: list[str] = data.get_headers()
     rows: list[list[str]] = data.get_rows()
-    display_headers: set = set()
+    display_cols: set = set()
+    category_totals: dict = {}
     ui = ConsoleUI()
 
     # Get required column entries
 
-    amount_col = request_selection(ui, "Select the entry for the charge amount: ", headers, display_headers)
-    desc_col = request_selection(ui, "Select the entry for the charge description: ", headers, display_headers)
+    category_init(headers, rows)
+    category_col = headers.index("Category")
+    display_cols.add(category_col)
 
-    display_headers.add(amount_col)
-    display_headers.add(desc_col)
+    amount_col = request_selection(ui, "Select the entry for the charge amount: ", headers, display_cols)
+    display_cols.add(amount_col)
+    
+    desc_col = request_selection(ui, "Select the entry for the charge description: ", headers, display_cols)
+    display_cols.add(desc_col)
     
     entry = float("-inf")
     while entry != -1:
-        entry = request_selection(ui, "Select any additional columns to include. Press 0 to continue. ", headers, display_headers)
+        entry = request_selection(ui, "Select any additional columns to include. Press 0 to continue. ", headers, display_cols)
         if entry != -1:
-            display_headers.add(entry)
-
-    # Collect data for included columns
-
-    header_strs = []
-    data_strs = []
-
-    for i in display_headers:
-        header_strs.append(headers[i])
-    
-    for row in rows:
-        data = []
-        for i in display_headers:
-            data.append(row[i])
-        data_strs.append(data)
-
-    category_init(header_strs, data_strs)
-
-    category_col = header_strs.index("Category")
+            display_cols.add(entry)
 
     # Table Execution
 
     while True:
-        show_menu(ui, header_strs, data_strs, "Enter: Search Description | X: Exit Program")
+        show_menu(ui, headers, rows, display_cols, "Enter: Search Description | X: Exit Program")
         entry = input().lower()
         match entry:
             case "":
                 matches = ui.search(get_col_vals(rows, desc_col))
-                new_rows = get_rows_by_col(data_strs, matches) # What if nothing matches?
+                new_rows = get_rows_by_col(rows, matches)
                 if len(new_rows[0]) == 0:
                     print("No results found.")
                 else:
-                    show_menu(ui, header_strs, new_rows, "C: Set Category | Enter: Clear Search")
+                    show_menu(ui, headers, new_rows, display_cols, "C: Set Category | Enter: Clear Search")
                     search_entry = input()
                     if search_entry == "":
                         pass
                     elif search_entry == "c":
-                        category = input("Enter Category for these transactions: ")
+                        category = input("Enter a Category for these transactions: ")
                         for row in new_rows:
-                            row[category_col] = category
-
+                            # parent_row = get_parent(rows, row)
+                            update_category(row, category_totals, category, category_col, amount_col)
+                            print(category_totals)
             case "x":
                 print("Exiting program...")
                 break
@@ -74,15 +62,38 @@ def request_selection(ui: ConsoleUI, text: str, selections: list[str], ignore: l
         return request_selection(ui, text, selections, ignore)
     return entry
 
-def show_menu(ui: ConsoleUI, headers: list[str], data: list[list[str]], input_list: str) -> None:
-    ui.display_table(headers, data)
+def show_menu(ui: ConsoleUI, headers: list[str], data: list[list[str]], display_cols: list[int], input_list: str) -> None:
+    ui.display_table(get_display_headers(headers, display_cols), get_display_data(data, display_cols))
     print("\n" + input_list)
+
+def get_display_headers(headers: list[str], display_cols: list[int]) -> list[str]:
+    display_headers = []
+    for i in display_cols:
+        display_headers.append(headers[i])
+    return display_headers
+
+def get_display_data(data: list[list[str]], display_cols: list[int]) -> list[list[str]]:
+    display_data = []
+    for row in data:
+        display_row = []
+        for i in display_cols:
+            display_row.append(row[i])
+        display_data.append(display_row)
+    return display_data
 
 def get_col_vals(data: list[list[str]], col: int) -> list[str]:
     values = []
     for i in range(len(data)):
         if col < len(data[i]):
             values.append(data[i][col])
+    return values
+
+def get_unique_col_vals(data: list[list[str]], col: int) -> list[str]:
+    values = []
+    for i in range(len(data)):
+        if col < len(data[i]):
+            if data[i][col] not in values:
+                values.append(data[i][col])
     return values
 
 def get_rows_by_col(data: list[list[str]], cols: list[str]) -> list[list[str]]:
@@ -104,6 +115,19 @@ def category_init(headers: list[str], data: list[list[str]]) -> None:
         headers.append("Category")
         for row in data:
             row.append("")
+
+def update_category(row: list[str], category: dict, new_category: str, category_col: int, amount_col: int) -> None:
+    if row[category_col] != "":
+        category[row[category_col]] -= float(row[amount_col])
+        if category[row[category_col]] == 0:
+            category.pop(row[category_col])
+
+    if new_category in category.keys():
+        category[new_category] += float(row[amount_col])
+    else:
+        category[new_category] = float(row[amount_col])
+    
+    row[category_col] = new_category
 
 if __name__ == "__main__":
     main()

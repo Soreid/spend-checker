@@ -37,6 +37,46 @@ class Test_Main(unittest.TestCase):
             with self.subTest(test = test):
                 self.assertEqual(main.get_col_vals(test["data"], test["col"]), test["expected"])
 
+    def test_get_unique_col_vals(self):
+        test_data = [
+                        ["123", "Wednesday", "2025", "88.33"],
+                        ["123", "Thursday", "2024", "241.75"],
+                        ["124", "Friday", "2025", "1800.00"],
+                        ["122", "Monday", "2024", "88.33"]
+                    ]
+
+        tests = [
+            {
+                "data": test_data,
+                "col": 0,
+                "expected": ["123", "124", "122"]
+            },
+            {
+                "data": test_data,
+                "col": 1,
+                "expected": ["Wednesday", "Thursday", "Friday", "Monday"]
+            },
+            {
+                "data": test_data,
+                "col": 2,
+                "expected": ["2025", "2024"]
+            },
+            {
+                "data": test_data,
+                "col": 3,
+                "expected": ["88.33", "241.75", "1800.00"]
+            },
+            {
+                "data": [[]],
+                "col": 2,
+                "expected": []
+            }
+        ]
+
+        for test in tests:
+            with self.subTest(test = test):
+                self.assertEqual(main.get_unique_col_vals(test["data"], test["col"]), test["expected"])
+
     def test_get_rows_by_col(self):
         test_data = [
                         ["125", "Charlie", "SR3353Z", "Lorem ipsum dolor sit amet."],
