@@ -17,6 +17,7 @@ def main():
 
     amount_col = request_selection(ui, "Select the entry for the charge amount: ", headers, display_cols)
     display_cols.add(amount_col)
+    amount_init(rows, amount_col)
     
     desc_col = request_selection(ui, "Select the entry for the charge description: ", headers, display_cols)
     display_cols.add(desc_col)
@@ -128,13 +129,22 @@ def get_rows_by_col(data: list[list[str]], cols: list[str]) -> list[list[str]]:
     return rows
 
 def category_init(headers: list[str], data: list[list[str]]) -> None:
-    if "Category" not in headers:
+    if "Category" in headers:
+        col = headers.index("Category")
+        for row in data:
+            row[col] = ""
+    else:
         headers.append("Category")
         for row in data:
             row.append("")
 
+def amount_init(data: list[list[str]], amount_col: int) -> None:
+    for row in data:
+        if row[amount_col] == '':
+            row[amount_col] = '0.00'
+
 def update_category(row: list[str], category: dict, new_category: str, category_col: int, amount_col: int) -> None:
-    """Updates the category listing in the data row and the category dictionary to adjust for the new value...."""
+    """Updates the category listing in the data row and the category dictionary to adjust for the new value."""
     if row[category_col] != "":
         category[row[category_col]] -= float(row[amount_col])
         if category[row[category_col]] == 0:
