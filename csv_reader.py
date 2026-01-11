@@ -11,7 +11,9 @@ class CsvData:
         with open(self.path) as f:
             headers = f.readline()[:-1].split(delimiter)
             for line in f.readlines():
-                rows.append(line[:-1].split(delimiter))
+                row = line[:-1].split(delimiter)
+                if row != ['']:
+                    rows.append(row)
         return (headers, rows)
 
     def get_headers(self) -> list[str]:
