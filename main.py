@@ -48,7 +48,10 @@ def main():
 
                     #Categorize Search Results
                     elif search_entry == "c":
-                        category = input("Enter a Category for these transactions: ")
+                        print('\nPrevious Categories:\n')
+                        for category in category_totals.keys():
+                            print(category)
+                        category = input("\nEnter a Category for these transactions: ")
                         for row in new_rows:
                             update_category(row, category_totals, category, category_col, amount_col)
 

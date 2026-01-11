@@ -1,3 +1,5 @@
+import os
+
 class ConsoleUI:
     def __print_selector(self, items: list, skip_indexes: list[int] = None) -> None:
         for i in range(len(items)):
@@ -41,8 +43,10 @@ class ConsoleUI:
             max_chars.append(max_length)
         return max_chars
             
-    def display_table(self, header: list[str], data: list[list]) -> None:
+    def display_table(self, header: list[str], data: list[list], clear = True) -> None:
         """Prints data to the console adjusted for column widths."""
+        if clear:
+            self.clear_window()
         padding_set = self.__get_col_lengths(header, data)
         data_set = data.copy()
         data_set.insert(0, header)
@@ -68,3 +72,9 @@ class ConsoleUI:
         """Requests an input value and returns the list items containing that value."""
         search_term = input("Enter the search term: ")
         return self.__match_search_term(values, search_term)
+    
+    def clear_window(self):
+        if os.name == 'nt':
+            os.system('cls')
+        else:
+            os.system('clear')
